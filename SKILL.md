@@ -1,5 +1,6 @@
 ---
 name: oc-doc
+version: 1.0.0
 description: >
   Claude Cowork skill for troubleshooting, diagnosing, and improving OpenClaw deployments from outside
   OpenClaw itself. This skill gives Claude the knowledge to help users fix their OpenClaw setup via
