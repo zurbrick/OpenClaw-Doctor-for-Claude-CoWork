@@ -1,0 +1,23 @@
+{
+  "skill_name": "oc-doc",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "My openclaw main agent stopped responding in Telegram about 20 minutes ago. Here's the doctor output showing session locks with pid=24944 alive but stale=no, and a channel warning about a group not reachable. The cron jobs are still firing fine though. What do I do?",
+      "expected_output": "Should identify the Telegram handler as hung (cron works but Telegram doesn't = handler-specific issue), recommend openclaw gateway restart as the primary fix, explain that --fix resolved the group warning, and suggest checking logs after restart if it recurs.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "I just updated openclaw and now when I try to start the gateway I get 'refusing to bind gateway without auth'. I was running fine before the update. My config has gateway.mode set to local and I'm binding to lan. What changed?",
+      "expected_output": "Should explain that non-loopback binds now require authentication (post-update behavior change), recommend setting gateway.auth.token, mention openclaw doctor --fix for config format changes, and suggest openclaw gateway install --force if service config drifted.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I want to set up a second agent in openclaw for my work stuff, separate from my personal agent. The work agent should only respond in my company's Telegram group and the personal one should handle everything else. How do I set this up and what pitfalls should I watch for?",
+      "expected_output": "Should walk through openclaw agents add with a separate workspace, explain routing bindings with openclaw agents bind, warn about never reusing agentDir (auth/session collisions), explain most-specific-wins routing priority, and mention that each agent needs its own session store.",
+      "files": []
+    }
+  ]
+}
