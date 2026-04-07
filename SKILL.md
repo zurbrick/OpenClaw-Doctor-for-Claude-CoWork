@@ -2,17 +2,7 @@
 name: oc-doc
 version: 1.0.0
 description: >
-  Claude Cowork skill for troubleshooting, diagnosing, and improving OpenClaw deployments from outside
-  OpenClaw itself. This skill gives Claude the knowledge to help users fix their OpenClaw setup via
-  Cowork's desktop environment — reading doctor output, suggesting CLI commands, and guiding config
-  changes. Use this skill whenever the user mentions OpenClaw issues, gateway problems, stuck agents,
-  channel failures (Telegram/Discord/iMessage/Slack), session locks, cron job failures, heartbeat
-  issues, message delivery problems, or wants to optimize their OpenClaw configuration. Also triggers
-  on: "openclaw doctor", "gateway not responding", "bot not replying", "agent stuck", "messages not
-  delivering", "Telegram bot broken", "openclaw won't start", "session stuck", "cron not running",
-  "heartbeat failed", "channel warnings", "openclaw update", "openclaw config", or any error messages
-  containing "openclaw" or "claw". Even if the user just says something vague like "my bot is down"
-  or "the agent isn't working" — if OpenClaw is their messaging platform, use this skill.
+  Troubleshoot, diagnose, and optimize OpenClaw deployments. Use this skill whenever the user mentions OpenClaw issues, gateway problems, stuck agents, channel failures (Telegram/Discord/iMessage/Slack), session locks, cron job failures, heartbeat issues, or message delivery problems. Triggers on "openclaw doctor", "gateway not responding", "bot not replying", "agent stuck", "messages not delivering", "Telegram bot broken", "openclaw won't start", "session stuck", "cron not running", "heartbeat failed", "channel warnings", "openclaw update", "openclaw config", "my bot is down", or "the agent isn't working".
 ---
 
 # OC-Doc: OpenClaw Troubleshooting & Optimization
