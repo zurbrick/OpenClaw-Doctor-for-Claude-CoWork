@@ -18,6 +18,48 @@
       "prompt": "I want to set up a second agent in openclaw for my work stuff, separate from my personal agent. The work agent should only respond in my company's Telegram group and the personal one should handle everything else. How do I set this up and what pitfalls should I watch for?",
       "expected_output": "Should walk through openclaw agents add with a separate workspace, explain routing bindings with openclaw agents bind, warn about never reusing agentDir (auth/session collisions), explain most-specific-wins routing priority, and mention that each agent needs its own session store.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "My openclaw cron job is supposed to send me a daily briefing at 8am but it hasn't fired in 3 days. The gateway is running fine and I can message the bot manually. What should I check?",
+      "expected_output": "Should recommend checking openclaw logs --follow for 'cron: scheduler disabled' messages, verify the cron scheduler is enabled in config, inspect job definitions in ~/.openclaw/cron/jobs.json for format issues, check for quiet-hours or dm-blocked filtering, and suggest openclaw doctor to validate cron job shape.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "I have hundreds of old sessions cluttering up my openclaw. Some are months old. How do I clean them up safely without losing active conversations?",
+      "expected_output": "Should recommend openclaw sessions cleanup --dry-run first to preview what would be pruned, explain that cleanup targets inactive/old sessions while preserving active ones, then openclaw sessions cleanup to execute. Mention openclaw sessions --active 60 to verify active sessions are intact afterward.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "I ran openclaw security audit --deep and it flagged several issues including an open dmPolicy and exposed secret refs. How concerned should I be and what should I fix first?",
+      "expected_output": "Should prioritize fixing exposed secret refs immediately (highest risk), then recommend changing dmPolicy from open to pairing or allowlist for production, walk through openclaw config set for each change, and suggest re-running the audit after fixes to confirm resolution. Should mention exec approvals as an additional hardening step.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "My Discord bot was working yesterday but now it's ignoring all messages in my server. It still responds to DMs though. I haven't changed any config.",
+      "expected_output": "Should identify this as likely a Discord Message Content Intent issue (Discord may have disabled it or it expired), recommend checking the Discord Developer Portal for the bot's Privileged Gateway Intents, verify the bot has correct OAuth2 scopes and channel permissions, and suggest openclaw logs --follow to look for permission errors. Should NOT fabricate detailed Discord troubleshooting beyond what's documented — recommend openclaw docs discord for deeper issues.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Everything is broken. My bot doesn't respond anywhere, the gateway status shows it's running, openclaw doctor shows no errors. I'm completely stuck. Help.",
+      "expected_output": "Should follow a systematic cold-start triage: 1) openclaw health to verify the gateway is actually healthy (not just the process), 2) openclaw channels status --probe to validate all channel connectivity, 3) openclaw logs --follow then trigger a test message to see what's happening at the message level, 4) openclaw sessions --active 60 to check for session issues. Should stay calm and methodical, not guess at causes without log evidence.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "I'm getting HTTP 429 rate limit errors in my openclaw logs and my bot is dropping messages during busy periods. How do I make it more resilient?",
+      "expected_output": "Should recommend configuring model fallbacks (openclaw config set agents.defaults.model.fallbacks with a cheaper/faster model like claude-haiku), check API key billing status, consider reducing context with imageMaxDimensionPx setting, and mention that hot reload applies fallback config without restart. Should explain the fallback chain behavior.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "I want to set up my Telegram bot to work in a supergroup with forum topics, where each topic routes to a different agent. How does that work?",
+      "expected_output": "Should explain that topic IDs append to session keys as :topic:<threadId>, each topic can route to a different agent via agentId in the topic config, topics inherit group settings unless overridden. Should mention getting topic IDs from gateway logs, and warn about session isolation between agents. Should reference the multi-agent setup guidance for binding agents.",
+      "files": []
     }
   ]
 }

@@ -49,6 +49,49 @@ Before diving in, understand the key file paths and commands:
 | `openclaw channels status --probe` | Validate channel configuration |
 | `openclaw config set <path> <value>` | Update a config setting |
 
+## Symptom-to-Diagnosis Quick Reference
+
+When the user describes a problem, match their symptom to this table first — it gets you to the right fix faster than walking through the full diagnostic sequence.
+
+### "It's not responding"
+
+| Symptom | Probable Cause | First Command | Fix |
+|---------|---------------|---------------|-----|
+| Bot stopped responding on one channel, cron still fires | Channel handler hung | `openclaw gateway restart` | Restart clears the hung handler; check logs after |
+| Bot stopped responding everywhere | Gateway down or crashed | `openclaw gateway status` | If not running: `openclaw gateway start`. If running but unresponsive: `openclaw gateway restart` |
+| Bot responds in DMs but not groups | Privacy mode or mention gating | `openclaw logs --follow` (send group message) | BotFather `/setprivacy → Disable`, remove/re-add bot to group |
+| Bot responds to some users but not others | DM policy filtering | `openclaw doctor` | Check `dmPolicy` setting. If "pairing": approve with `openclaw pairing approve <channel> <code>` |
+| Bot receives messages but never replies | Model errors (429, timeout) | `openclaw logs --follow` | Check API key billing, add fallback models |
+
+### "It won't start"
+
+| Symptom | Probable Cause | First Command | Fix |
+|---------|---------------|---------------|-----|
+| "refusing to bind without auth" | Non-loopback bind missing credentials | — | `openclaw config set gateway.auth.token <token>` |
+| "EADDRINUSE" | Port 18789 already in use | `lsof -i :18789` | Kill conflicting process or `openclaw gateway --force` |
+| "set gateway.mode=local" | Missing gateway mode config | — | `openclaw config set gateway.mode local` |
+| "AUTH_TOKEN_MISMATCH" | Stale token after config change | — | Refresh token, re-run `openclaw gateway install` |
+| Crashes immediately after update | Config format drift | `openclaw doctor --fix` | Auto-repairs config, then `openclaw gateway install --force` |
+
+### "Something is wrong with messages"
+
+| Symptom | Probable Cause | First Command | Fix |
+|---------|---------------|---------------|-----|
+| Messages deliver but responses are slow | Rate limiting or long context | `openclaw logs --follow` | Look for 429 errors; add fallback models or reduce context |
+| "pairing request" in logs | Sender not approved | — | `openclaw pairing approve <channel> <code>` |
+| "drop guild message" in logs | Mention required in group | — | Set `requireMention: false` per-group, or disable privacy mode |
+| Messages appear in logs but no agent response | Agent processing failure | `openclaw sessions --active 60` | Check for stale session locks; `openclaw doctor --fix` if stale |
+| Cron messages not firing | Scheduler disabled or job misconfigured | `openclaw logs --follow` | Check for "cron: scheduler disabled"; verify `~/.openclaw/cron/jobs.json` |
+
+### "I just updated and things broke"
+
+| Symptom | Probable Cause | First Command | Fix |
+|---------|---------------|---------------|-----|
+| Auth errors after update | New security requirements | `openclaw doctor --fix` | Repairs config format; set `gateway.auth.token` if needed |
+| Service won't start after update | Service config drift | `openclaw gateway install --force` | Reinstalls service with current config |
+| Channels disconnected after update | Config key changes | `openclaw channels status --probe` | Verify channel config; check release notes for breaking changes |
+
+
 ## Diagnostic Workflow
 
 When the user reports an issue, follow this triage sequence. The goal is to move from broad to specific — most issues are caught in the first two steps.

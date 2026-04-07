@@ -1,6 +1,24 @@
 # Channel-Specific Troubleshooting
 
+## Coverage Depth
+
+> **Important for Claude:** This table shows how much troubleshooting knowledge is available per channel. For channels marked "Basic," do NOT fabricate detailed troubleshooting steps — instead, recommend `openclaw docs <channel>` or checking the OpenClaw Discord for help.
+
+| Channel | Coverage | What's Covered |
+|---------|----------|---------------|
+| Telegram | **Deep** | Setup, privacy mode, DM policies, groups, webhooks, forums, exec approvals, stickers, full error table |
+| Discord | **Moderate** | Setup, OAuth scopes, intents, role routing, guild routing |
+| Slack | **Basic** | Setup and common OAuth/scope issues only |
+| iMessage | **Basic** | Setup requirements and macOS permissions only |
+| WhatsApp | **Basic** | Setup requirements and rate limiting only |
+
+For basic-coverage channels: guide the user through `openclaw channels status --probe` and `openclaw logs --follow` first (these work for all channels), then suggest `openclaw docs <channel>` for platform-specific details beyond what's documented here.
+
+---
+
 ## Telegram
+
+**Coverage: Deep** — full troubleshooting, config examples, and error tables.
 
 ### Setup Checklist
 1. Create bot via @BotFather → `/newbot` → save token
@@ -103,11 +121,22 @@ Enable with `actions.sticker: true`. Stickers are cached at `~/.openclaw/telegra
 
 ## Discord
 
-### Common Issues
-- **Bot not responding in server**: Check that the bot has the correct OAuth2 scopes (bot + applications.commands) and is in the server
-- **Missing messages**: Verify the bot has "Message Content Intent" enabled in the Discord Developer Portal
-- **Role-based routing**: Discord supports routing by role — bindings can match on Discord role IDs
-- **Guild ID routing**: Use guild (server) ID in agent bindings for per-server agent assignment
+**Coverage: Moderate** — setup, permissions, and routing. For advanced Discord troubleshooting (slash commands, embed formatting, voice), run `openclaw docs discord`.
+
+### Setup Checklist
+1. Create application in [Discord Developer Portal](https://discord.com/developers/applications)
+2. Enable "Message Content Intent" under Bot settings (required to read messages)
+3. Add bot to server with OAuth2 scopes: `bot` + `applications.commands`
+4. Set token in config: `channels.discord.botToken` or `DISCORD_BOT_TOKEN` env var
+5. Start gateway: `openclaw gateway`
+
+### Common Discord Issues
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Bot not responding in server | Missing OAuth2 scopes or bot not in server | Re-invite with correct scopes (`bot` + `applications.commands`) |
+| Missing messages / bot ignores some messages | "Message Content Intent" not enabled | Enable in Discord Developer Portal → Bot → Privileged Gateway Intents |
+| Bot responds in wrong server | No guild-specific routing | Use guild (server) ID in agent bindings for per-server assignment |
+| Permission errors | Missing channel permissions | Ensure bot role has Send Messages, Read Message History, Embed Links |
 
 ### Configuration Pattern
 ```json5
@@ -122,41 +151,94 @@ Enable with `actions.sticker: true`. Stickers are cached at `~/.openclaw/telegra
 }
 ```
 
----
-
-## iMessage
-
-### Key Points
-- iMessage requires macOS with Messages.app
-- Uses AppleScript/Shortcuts integration
-- More limited than other channels — no streaming, limited media support
-- Check macOS permissions for automation
+### Routing
+- **Role-based routing**: Bindings can match on Discord role IDs — useful for routing different teams to different agents
+- **Guild ID routing**: Use guild (server) ID in agent bindings for per-server agent assignment
+- **DM vs server**: DMs route through the default agent unless explicitly bound
 
 ---
 
 ## Slack
 
+**Coverage: Basic** — setup and common permission issues. For advanced Slack troubleshooting (interactive components, modals, home tabs), run `openclaw docs slack`.
+
+### Setup Checklist
+1. Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps)
+2. Add required OAuth scopes: `chat:write`, `channels:history`, `channels:read`, `im:history`, `im:read`, `im:write`
+3. Enable Event Subscriptions and subscribe to: `message.channels`, `message.im`
+4. Install app to workspace and copy the Bot User OAuth Token
+5. Set token in config: `channels.slack.botToken` or `SLACK_BOT_TOKEN` env var
+
+### Common Slack Issues
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| 401 Unauthorized | Invalid or expired token | Re-install app to workspace, copy new Bot User OAuth Token |
+| 403 Forbidden | Missing OAuth scopes | Add required scopes in app settings, reinstall to workspace |
+| Bot doesn't see messages | Event subscriptions not configured | Configure Event Subscriptions in Slack app dashboard |
+| Bot can't post to channel | Missing `chat:write` scope or not in channel | Add scope, invite bot to channel with `/invite @botname` |
+
+### Configuration Pattern
+```json5
+{
+  channels: {
+    slack: {
+      enabled: true,
+      botToken: "xoxb-your-slack-bot-token",
+      dmPolicy: "pairing",
+    },
+  },
+}
+```
+
+---
+
+## iMessage
+
+**Coverage: Basic** — setup requirements and platform constraints. For advanced iMessage troubleshooting, run `openclaw docs imessage`.
+
+### Requirements
+- macOS only (requires Messages.app)
+- Uses AppleScript/Shortcuts integration
+- macOS must grant automation permissions to the gateway process
+
+### Limitations
+- No streaming support
+- Limited media support compared to other channels
+- No group chat management
+- Delivery receipts not supported
+
 ### Common Issues
-- **OAuth scopes**: Ensure the app has all required scopes (chat:write, channels:history, etc.)
-- **401/403 errors**: Usually missing OAuth scopes
-- **Event subscriptions**: Must be configured in the Slack app dashboard
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| "not permitted" errors | Missing macOS automation permissions | System Settings → Privacy & Security → Automation → enable for gateway |
+| Messages not sending | Messages.app not signed in | Open Messages.app and sign in to iMessage |
+| Delayed responses | AppleScript execution overhead | Expected — iMessage integration is inherently slower |
 
 ---
 
 ## WhatsApp
 
-### Key Points
-- Requires WhatsApp Business API or Cloud API setup
-- More complex setup than other channels
-- Rate limiting is strict — configure fallbacks
+**Coverage: Basic** — setup requirements and rate limiting. For advanced WhatsApp troubleshooting, run `openclaw docs whatsapp`.
+
+### Requirements
+- WhatsApp Business API or Cloud API account
+- More complex setup than other channels — requires Meta Business verification for production
+
+### Common Issues
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| Rate limited | WhatsApp's strict message limits | Configure model fallbacks, reduce message frequency |
+| "Template required" | Initiating conversations requires approved templates | Use pre-approved message templates for first contact |
+| Webhook delivery failures | Incorrect webhook URL or SSL issues | Verify webhook URL is HTTPS with valid certificate |
 
 ---
 
 ## General Channel Troubleshooting
 
-For any channel:
+For any channel, regardless of coverage depth:
 1. `openclaw channels status --probe` — validates configuration and connectivity
 2. `openclaw logs --follow` — watch for channel-specific errors
 3. Check `dmPolicy` and `allowFrom` settings
 4. Verify the channel is `enabled: true` in config
 5. After config changes, the gateway hot-reloads most settings automatically
+6. If all else fails: `openclaw docs <channel>` for the latest platform-specific docs
