@@ -1,0 +1,22 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Secrets (belt and suspenders)
+.env
+*.pem
+*.key
+
+# Skill workspace artifacts
+*-workspace/

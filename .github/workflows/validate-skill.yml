@@ -1,0 +1,31 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          echo "Checking SKILL.md..."
+          test -f SKILL.md || (echo "SKILL.md missing" && exit 1)
+          echo "Checking references/channels.md..."
+          test -f references/channels.md || (echo "references/channels.md missing" && exit 1)
+          echo "Checking references/cli-reference.md..."
+          test -f references/cli-reference.md || (echo "references/cli-reference.md missing" && exit 1)
+          echo "All required files present."
+
+      - name: Validate SKILL.md frontmatter
+        run: |
+          echo "Checking YAML frontmatter..."
+          head -1 SKILL.md | grep -q "^---$" || (echo "Missing frontmatter opening ---" && exit 1)
+          grep -q "^name:" SKILL.md || (echo "Missing 'name' field" && exit 1)
+          grep -q "^description:" SKILL.md || (echo "Missing 'description' field" && exit 1)
+          echo "Frontmatter OK."

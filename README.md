@@ -1,85 +1,83 @@
-# OpenClaw Doctor for Claude CoWork
+# OpenClaw Doctor (oc-doc)
 
-**The missing troubleshooting companion for OpenClaw.** Diagnose gateway failures, fix stuck agents, debug Telegram/Discord/iMessage/Slack channels, optimize multi-agent routing, and manage your entire OpenClaw deployment — all from Claude CoWork or Claude Code.
+A Claude skill for troubleshooting, diagnosing, and optimizing [OpenClaw](https://github.com/nichochar/open-claw) deployments. Manage your entire OpenClaw setup through Claude CoWork or Claude Code — from quick health checks to deep channel debugging.
 
-## Why This Exists
-
-OpenClaw is powerful, but when something breaks at 11pm and your Telegram bot goes silent, you're left grepping through docs and guessing at CLI commands. OC-Doc puts an OpenClaw expert inside Claude. Paste your `openclaw doctor` output, describe the symptom, or just say "my bot is down" — Claude knows exactly what to check and how to fix it.
-
-## What Claude Can Do With This Skill
-
-**Diagnose in seconds** — Reads `openclaw doctor` output and immediately identifies the issue: stale session locks, hung Telegram handlers, gateway auth mismatches, unreachable groups, privacy mode traps, cron scheduler failures, and more.
-
-**Run commands for you** — With Desktop Commander or terminal access, Claude executes `openclaw gateway restart`, `openclaw logs --follow`, `openclaw config set`, and any other CLI command directly on your machine. No copy-paste required.
-
-**Step-by-step playbooks** for the most common emergencies: agent not responding on Telegram, gateway won't start after update, messages delivering but no response, cron jobs not firing, post-upgrade auth failures.
-
-**Channel-specific deep dives** — Telegram privacy mode, BotFather setup, group configuration, webhook vs polling, DM pairing, forum topics. Discord OAuth scopes and Message Content Intent. iMessage automation permissions. Slack event subscriptions. WhatsApp Business API rate limits.
-
-**Configuration optimization** — Multi-agent routing with most-specific-wins priority, model fallback chains for graceful degradation during rate limiting, channel health check tuning, session cleanup, security hardening with pairing policies and exec approvals.
-
-**Full CLI reference** — Every `openclaw` command, subcommand, and flag. Gateway lifecycle, agent management, session inspection, channel probing, cron scheduling, memory search, browser control, backup/restore, and more.
-
-## Install
-
-Clone into your Claude skills directory:
+## Installation
 
 ```bash
+# Manual
 git clone https://github.com/zurbrick/OpenClaw-Doctor-for-Claude-CoWork.git ~/.claude/skills/oc-doc
 ```
 
-The skill is immediately available in your next Claude CoWork or Claude Code session. No configuration needed.
+## What It Does
 
-## Setup for Maximum Power
+OC-Doc equips Claude with deep knowledge of OpenClaw's CLI, configuration patterns, and troubleshooting workflows so it can diagnose and fix your deployment from the outside. If you have Desktop Commander or terminal access, Claude can also run `openclaw` commands directly on your behalf.
 
-OC-Doc works at three levels depending on what access Claude has:
+The skill follows a 5-step diagnostic sequence that mirrors how an experienced operator would troubleshoot:
 
-| Access Level | What Claude Can Do |
-|---|---|
-| **No file access** | Interpret doctor output you paste in, advise on commands to run, explain error messages |
-| **File access** (`~/.openclaw` mounted) | Read your config, inspect session locks, check cron jobs, analyze logs directly |
-| **Desktop Commander / terminal** | Run `openclaw` CLI commands on your Mac — restart gateways, tail logs, update config, probe channels |
+1. **Run `openclaw doctor`** — catches most common issues in one command
+2. **Check gateway health** — validates service status and RPC connectivity
+3. **Inspect logs** — identifies rate limiting, network failures, or message drops
+4. **Examine sessions** — detects stuck conversations or stale lock files
+5. **Channel-specific diagnosis** — addresses platform-specific problems
 
-For the full experience, select your home directory or `~/.openclaw` as your CoWork working directory, or connect Desktop Commander.
+## Trigger Phrases
 
-## Usage
+This skill activates when you say things like:
 
-Just describe your problem. The skill triggers automatically.
+- "openclaw doctor", "gateway not responding", "bot not replying"
+- "agent stuck", "messages not delivering", "Telegram bot broken"
+- "openclaw won't start", "session stuck", "cron not running"
+- "heartbeat failed", "channel warnings", "openclaw update"
+- "my bot is down", "the agent isn't working"
 
-```
-"My OpenClaw bot stopped responding in Telegram"
-"Gateway won't start — says refusing to bind without auth"
-"Help me set up separate agents for work and personal"
-"What do these channel warnings mean?" [paste doctor output]
-"My cron jobs aren't firing"
-"Set up model fallbacks so my bot doesn't go down during rate limiting"
-"How do I add a second Telegram group with different settings?"
-"OpenClaw updated and now everything is broken"
-```
-
-## Skill Contents
+## Structure
 
 ```
 oc-doc/
-├── SKILL.md                    # Diagnostic workflows, playbooks, config optimization
+├── SKILL.md                    # Core diagnostic workflows and optimization guidance
 ├── README.md
+├── VERSION
+├── CHANGELOG.md
+├── evals/
+│   └── evals.json              # Evaluation scenarios for skill testing
 └── references/
-    ├── channels.md             # Telegram, Discord, iMessage, Slack, WhatsApp troubleshooting
-    └── cli-reference.md        # Complete openclaw CLI command reference
+    ├── channels.md             # Platform-specific troubleshooting (Telegram, Discord, etc.)
+    └── cli-reference.md        # Complete OpenClaw CLI documentation (80+ commands)
 ```
 
-## Covered Topics
+## Coverage
 
-OpenClaw gateway management, openclaw doctor interpretation, openclaw CLI reference, Telegram bot troubleshooting, Discord bot setup, iMessage automation, Slack integration, WhatsApp Business API, multi-agent routing, agent isolation, session lock debugging, cron job scheduling, heartbeat configuration, webhook setup, long polling, privacy mode, BotFather configuration, DM pairing policies, group allowlists, exec approvals, model fallback chains, rate limit handling, channel health checks, config validation, gateway service install, Tailscale integration, mDNS discovery, session cleanup, memory search, security audit, OpenClaw update troubleshooting, post-upgrade migration, config hot reload, streaming configuration, forum topic routing, sticker handling, inline buttons, and more.
+| Area | Depth |
+|------|-------|
+| Gateway management | Full — lifecycle, health, RPC, service install |
+| Telegram | Deep — privacy mode, DM policies, webhooks, forums, exec approvals |
+| Discord | Moderate — OAuth scopes, intents, role routing |
+| Slack / iMessage / WhatsApp | Basic — setup and common issues |
+| Session debugging | Full — lock detection, cleanup, agent isolation |
+| Cron & automation | Full — job config, webhook setup, hooks |
+| Multi-agent routing | Full — agent creation, bindings, identity |
+| Security | Full — audit, secret refs, config hardening |
+
+## Dependencies
+
+- **OpenClaw 2026.3.x or later** installed and configured
+- **Desktop Commander MCP** or terminal access (optional, for running commands directly)
+- No API keys or external dependencies required
 
 ## Compatibility
 
-Works with OpenClaw 2026.3.x and later. Built for Claude CoWork and Claude Code. Requires no API keys, no external services, no additional dependencies.
+- Claude CoWork
+- Claude Code
 
 ## Contributing
 
-Issues and PRs welcome at [github.com/zurbrick/OpenClaw-Doctor-for-Claude-CoWork](https://github.com/zurbrick/OpenClaw-Doctor-for-Claude-CoWork).
+Found a bug or want to improve this skill? Open an issue or submit a PR. See the issue templates for guidance.
 
 ## License
 
 MIT
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for version history.
